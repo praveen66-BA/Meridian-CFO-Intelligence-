@@ -1,0 +1,9 @@
+account_id,account_name,account_type,account_category,is_intercompany_flag,normal_balance,sort_order
+101,Product Revenue,Revenue,Income,0,Credit,1
+102,Service Revenue,Revenue,Income,0,Credit,2
+103,Other Income,Revenue,Income,1,Credit,3
+201,Cost of Goods Sold,COGS,Direct Cost,0,Debit,4
+202,Direct Labour Cost,COGS,Direct Cost,0,Debit,5
+301,Sales & Marketing Expense,OPEX,Indirect Cost,0,Debit,6
+302,General & Administrative Expense,OPEX,Indirect Cost,0,Debit,7
+401,Depreciation & Amortization,OPEX,Non-Cash,0,Debit,8
