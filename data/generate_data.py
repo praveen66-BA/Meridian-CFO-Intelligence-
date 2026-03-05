@@ -1,5 +1,5 @@
 
-# MERIDIAN GROUP — Synthetic Financial Data Generator
+# MERIDIAN GROUP  Synthetic Financial Data Generator
 
 
 import pandas as pd
@@ -65,7 +65,7 @@ def generate_dim_business_unit():
     }
     dim_bu = pd.DataFrame(data)
     dim_bu.to_csv(f"{OUTPUT_DIR}dim_business_unit.csv", index=False)
-    print(f"STEP 3 of 7 — dim_business_unit created — {len(dim_bu)} rows")
+    print(f"STEP 3  — dim_business_unit created — {len(dim_bu)} rows")
     return dim_bu
 
 dim_bu = generate_dim_business_unit()
@@ -106,7 +106,7 @@ def generate_dim_account():
     }
     dim_account = pd.DataFrame(data)
     dim_account.to_csv(f"{OUTPUT_DIR}dim_account.csv", index=False)
-    print(f"STEP 4 of 7 — dim_account created — {len(dim_account)} rows")
+    print(f"STEP 4 - dim_account created — {len(dim_account)} rows")
     return dim_account
 
 dim_account = generate_dim_account()
@@ -123,7 +123,7 @@ def generate_dim_scenario():
     }
     dim_scenario = pd.DataFrame(data)
     dim_scenario.to_csv(f"{OUTPUT_DIR}dim_scenario.csv", index=False)
-    print(f"STEP 5 of 7 — dim_scenario created — {len(dim_scenario)} rows")
+    print(f"STEP 5 - dim_scenario created — {len(dim_scenario)} rows")
     return dim_scenario
 
 dim_scenario = generate_dim_scenario()
