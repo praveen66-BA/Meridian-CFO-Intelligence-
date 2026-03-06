@@ -426,4 +426,4 @@ WHERE
 ORDER BY
     account_averages.avg_monthly_amount DESC;
 GO
-
+ 
