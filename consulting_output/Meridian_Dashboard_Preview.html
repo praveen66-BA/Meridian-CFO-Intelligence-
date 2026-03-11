@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian Group — CFO Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f2044;
+    --blue: #1a56db;
+    --blue-light: #dbeafe;
+    --teal: #0d9488;
+    --teal-light: #ccfbf1;
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --amber: #d97706;
+    --amber-light: #fef3c7;
+    --grey: #6b7280;
+    --light: #f8fafc;
+    --white: #ffffff;
+    --border: #e2e8f0;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --card-shadow-hover: 0 10px 25px rgba(0,0,0,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0a0f1e;
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,15,30,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; padding: 0 2rem;
+    height: 56px; gap: 0;
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    color: white; font-size: 1.1rem; margin-right: 2rem;
+    white-space: nowrap;
+  }
+  .nav-logo span { color: #60a5fa; }
+  .nav-tabs { display: flex; gap: 0; overflow-x: auto; flex: 1; }
+  .nav-tab {
+    padding: 0 1.2rem; height: 56px; display: flex; align-items: center;
+    color: rgba(255,255,255,0.5); font-size: 0.78rem; font-weight: 500;
+    cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent;
+    transition: all 0.2s; letter-spacing: 0.02em;
+  }
+  .nav-tab:hover { color: rgba(255,255,255,0.8); }
+  .nav-tab.active { color: #60a5fa; border-bottom-color: #60a5fa; }
+  .nav-badge {
+    margin-left: 0.4rem; background: var(--red);
+    color: white; font-size: 0.65rem; padding: 1px 5px;
+    border-radius: 10px; font-weight: 700;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; min-height: 100vh; padding: 72px 2rem 2rem; background: var(--light); }
+  .page.active { display: block; }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e3a6e 100%);
+    border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    color: white; font-size: 1.5rem; font-weight: 400;
+  }
+  .page-header p { color: rgba(255,255,255,0.6); font-size: 0.82rem; margin-top: 0.25rem; }
+  .page-header-right { text-align: right; }
+  .page-header-right .date { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
+  .page-header-right .status {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: rgba(22,163,74,0.2); color: #4ade80;
+    padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+    margin-top: 0.3rem;
+  }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── KPI CARDS ── */
+  .kpi-grid { display: grid; gap: 1rem; margin-bottom: 1rem; }
+  .kpi-5 { grid-template-columns: repeat(5, 1fr); }
+  .kpi-4 { grid-template-columns: repeat(4, 1fr); }
+  .kpi-3 { grid-template-columns: repeat(3, 1fr); }
+  .kpi-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .kpi-card {
+    background: white; border-radius: 10px; padding: 1.2rem 1.4rem;
+    box-shadow: var(--card-shadow); border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .kpi-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--blue);
+  }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.red::before { background: var(--red); }
+  .kpi-card.amber::before { background: var(--amber); }
+  .kpi-card.teal::before { background: var(--teal); }
+  .kpi-card.navy::before { background: var(--navy); }
+
+  .kpi-label { font-size: 0.72rem; color: var(--grey); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .kpi-value { font-family: 'DM Serif Display', serif; font-size: 1.8rem; color: var(--navy); line-height: 1; }
+  .kpi-value.large { font-size: 2.2rem; }
+  .kpi-sub { font-size: 0.72rem; margin-top: 0.4rem; display: flex; align-items: center; gap: 0.3rem; }
+  .kpi-up { color: var(--green); }
+  .kpi-down { color: var(--red); }
+  .kpi-neutral { color: var(--grey); }
+
+  .kpi-card.highlight {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e3a6e 100%);
+    color: white;
+  }
+  .kpi-card.highlight .kpi-label { color: rgba(255,255,255,0.6); }
+  .kpi-card.highlight .kpi-value { color: white; }
+  .kpi-card.highlight::before { display: none; }
+
+  .kpi-card.alert {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  }
+  .kpi-card.alert .kpi-label { color: rgba(255,255,255,0.7); }
+  .kpi-card.alert .kpi-value { color: white; }
+  .kpi-card.alert::before { display: none; }
+
+  /* ── CHARTS AREA ── */
+  .charts-grid { display: grid; gap: 1rem; margin-bottom: 1rem; }
+  .charts-2 { grid-template-columns: 1fr 1fr; }
+  .charts-3 { grid-template-columns: 2fr 1fr; }
+  .charts-32 { grid-template-columns: 3fr 2fr; }
+
+  .chart-card {
+    background: white; border-radius: 10px; padding: 1.2rem 1.4rem;
+    box-shadow: var(--card-shadow); border: 1px solid var(--border);
+  }
+  .chart-title {
+    font-size: 0.8rem; font-weight: 600; color: var(--navy);
+    margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;
+  }
+  .chart-title span { font-size: 0.7rem; color: var(--grey); font-weight: 400; }
+
+  /* ── BAR CHARTS ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 0.6rem; }
+  .bar-row { display: flex; align-items: center; gap: 0.8rem; }
+  .bar-label { font-size: 0.72rem; color: var(--grey); width: 100px; text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 20px; background: var(--light); border-radius: 4px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; }
+  .bar-fill span { font-size: 0.68rem; font-weight: 600; color: white; white-space: nowrap; }
+  .bar-val { font-size: 0.72rem; font-weight: 600; color: var(--navy); width: 60px; flex-shrink: 0; }
+
+  /* ── LINE CHART ── */
+  .line-chart-wrap { position: relative; height: 160px; }
+  .line-chart-wrap svg { width: 100%; height: 100%; }
+
+  /* ── TABLE ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  .data-table th {
+    background: var(--navy); color: white; padding: 0.6rem 0.8rem;
+    text-align: left; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .data-table td { padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--border); color: var(--navy); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:nth-child(even) td { background: #f8fafc; }
+  .data-table tr:hover td { background: var(--blue-light); }
+
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em;
+  }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-grey { background: #f3f4f6; color: var(--grey); }
+
+  /* ── WATERFALL ── */
+  .waterfall { display: flex; align-items: flex-end; gap: 6px; height: 160px; padding: 0 0.5rem; }
+  .wf-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .wf-bar { width: 100%; border-radius: 3px 3px 0 0; position: relative; }
+  .wf-label { font-size: 0.58rem; color: var(--grey); margin-top: 4px; text-align: center; line-height: 1.2; }
+  .wf-val { font-size: 0.62rem; font-weight: 600; position: absolute; top: -16px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+
+  /* ── SCATTER ── */
+  .scatter-wrap { position: relative; height: 180px; background: var(--light); border-radius: 8px; overflow: hidden; }
+  .scatter-dot {
+    position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 0.55rem; font-weight: 700; color: white; cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .scatter-dot:hover { transform: scale(1.2); }
+  .scatter-axis-x { position: absolute; bottom: 20px; left: 0; right: 0; height: 1px; background: var(--border); }
+  .scatter-axis-y { position: absolute; top: 0; bottom: 0; left: 40px; width: 1px; background: var(--border); }
+  .scatter-label-x { position: absolute; bottom: 4px; right: 8px; font-size: 0.6rem; color: var(--grey); }
+  .scatter-label-y { position: absolute; top: 4px; left: 4px; font-size: 0.6rem; color: var(--grey); writing-mode: vertical-rl; }
+
+  /* ── ANOMALY INDICATORS ── */
+  .anomaly-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .anomaly-item {
+    display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 0.9rem;
+    border-radius: 8px; border: 1px solid var(--border);
+  }
+  .anomaly-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+  .anomaly-info { flex: 1; }
+  .anomaly-title { font-size: 0.78rem; font-weight: 600; color: var(--navy); }
+  .anomaly-desc { font-size: 0.68rem; color: var(--grey); margin-top: 1px; }
+  .anomaly-badge { flex-shrink: 0; }
+
+  /* ── GAUGE ── */
+  .gauge-wrap { display: flex; flex-direction: column; align-items: center; }
+  .gauge-val { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--navy); }
+  .gauge-label { font-size: 0.7rem; color: var(--grey); }
+
+  /* ── SPARKLINE ── */
+  .sparkline svg { width: 100%; height: 40px; }
+
+  /* ── RLS CARD ── */
+  .rls-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.8rem; margin-bottom: 1rem; }
+  .rls-card {
+    background: white; border-radius: 10px; padding: 1rem;
+    border: 1px solid var(--border); text-align: center;
+  }
+  .rls-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin: 0 auto 0.5rem; }
+  .rls-name { font-size: 0.8rem; font-weight: 600; color: var(--navy); }
+  .rls-role { font-size: 0.68rem; color: var(--grey); }
+  .rls-tag { font-size: 0.65rem; margin-top: 0.4rem; padding: 2px 8px; border-radius: 20px; display: inline-block; }
+
+  /* ── MONTH LABELS ── */
+  .month-grid { display: grid; grid-template-columns: repeat(12,1fr); gap: 2px; margin-top: 0.5rem; }
+  .month-cell { text-align: center; font-size: 0.58rem; color: var(--grey); }
+
+  /* Responsive tweaks */
+  @media (max-width: 900px) {
+    .kpi-5 { grid-template-columns: repeat(3,1fr); }
+    .kpi-4 { grid-template-columns: repeat(2,1fr); }
+    .charts-2, .charts-3, .charts-32 { grid-template-columns: 1fr; }
+    .rls-grid { grid-template-columns: repeat(2,1fr); }
+  }
+
+  .full-width { grid-column: 1 / -1; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* metadata row */
+  .meta-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .meta-pill { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 0.25rem 0.8rem; font-size: 0.72rem; color: var(--grey); display: flex; align-items: center; gap: 0.3rem; }
+  .meta-pill strong { color: var(--navy); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">Meridian <span>CFO</span></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showPage(0)">Executive Summary</div>
+    <div class="nav-tab" onclick="showPage(1)">P&L Statement</div>
+    <div class="nav-tab" onclick="showPage(2)">Variance Analysis</div>
+    <div class="nav-tab" onclick="showPage(3)">Business Unit Deep Dive</div>
+    <div class="nav-tab" onclick="showPage(4)">Anomaly Intelligence <span class="nav-badge">5</span></div>
+    <div class="nav-tab" onclick="showPage(5)">Data Governance</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE 1 — EXECUTIVE SUMMARY -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page active" id="page-0">
+  <div class="page-header">
+    <div>
+      <h1>Executive Summary</h1>
+      <p>CFO overview — Meridian Group consolidated financials FY 2023–2024</p>
+    </div>
+    <div class="page-header-right">
+      <div class="date">Period: Jan 2023 – Dec 2024</div>
+      <div class="status"><span class="status-dot"></span> Live Data</div>
+    </div>
+  </div>
+
+  <!-- Row 1: Top KPIs -->
+  <div class="kpi-grid kpi-5" style="margin-bottom:1rem">
+    <div class="kpi-card highlight">
+      <div class="kpi-label">Total Revenue Actual</div>
+      <div class="kpi-value large">₹8.06 Cr</div>
+      <div class="kpi-sub" style="color:rgba(255,255,255,0.5)">All divisions • FY 2023–24</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Revenue Budget</div>
+      <div class="kpi-value">₹8.26 Cr</div>
+      <div class="kpi-sub kpi-neutral">Planned target</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Revenue Variance %</div>
+      <div class="kpi-value" style="color:var(--red)">-2.4%</div>
+      <div class="kpi-sub kpi-down">↓ ₹0.20 Cr below budget</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">EBITDA</div>
+      <div class="kpi-value">₹2.59 Cr</div>
+      <div class="kpi-sub kpi-up">↑ Margin 32.1%</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-label">EBITDA Margin %</div>
+      <div class="kpi-value">32.1%</div>
+      <div class="kpi-sub kpi-neutral">Gross margin 46.4%</div>
+    </div>
+  </div>
+
+  <!-- Row 2: Division Revenue -->
+  <div class="kpi-grid kpi-4" style="margin-bottom:1rem">
+    <div class="kpi-card navy">
+      <div class="kpi-label">North Division</div>
+      <div class="kpi-value">₹2.50 Cr</div>
+      <div class="kpi-sub kpi-neutral">Industrial Equipment • CC-001</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">West Division</div>
+      <div class="kpi-value">₹2.29 Cr</div>
+      <div class="kpi-sub kpi-down">⚠ Oct 2023 spike detected</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">South Division</div>
+      <div class="kpi-value">₹1.83 Cr</div>
+      <div class="kpi-sub kpi-down">⚠ Q3 2024 cost overrun</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">East Division</div>
+      <div class="kpi-value">₹1.44 Cr</div>
+      <div class="kpi-sub kpi-down">⚠ Dec 2023 missing accrual</div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-grid charts-3">
+    <!-- Bar chart -->
+    <div class="chart-card">
+      <div class="chart-title">Revenue Actual vs Budget by Division <span>₹ Crores</span></div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">North</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:85%;background:var(--blue)"><span>₹2.50 Cr</span></div>
+          </div>
+          <div class="bar-val" style="color:var(--grey);font-size:0.65rem">Bud: 2.61</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">West</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:78%;background:var(--amber)"><span>₹2.29 Cr</span></div>
+          </div>
+          <div class="bar-val" style="color:var(--grey);font-size:0.65rem">Bud: 2.35</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">South</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:62%;background:var(--teal)"><span>₹1.83 Cr</span></div>
+          </div>
+          <div class="bar-val" style="color:var(--grey);font-size:0.65rem">Bud: 1.89</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">East</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:49%;background:var(--navy)"><span>₹1.44 Cr</span></div>
+          </div>
+          <div class="bar-val" style="color:var(--grey);font-size:0.65rem">Bud: 1.51</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RAG Table + Anomaly card -->
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div class="chart-card">
+        <div class="chart-title">Division RAG Status</div>
+        <table class="data-table">
+          <thead><tr><th>Division</th><th>Variance%</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>West Division</td><td style="color:var(--green)">+0.04%</td><td><span class="badge badge-green">STRONG</span></td></tr>
+            <tr><td>North Division</td><td style="color:var(--red)">-0.05%</td><td><span class="badge badge-amber">AVERAGE</span></td></tr>
+            <tr><td>South Division</td><td style="color:var(--red)">-0.05%</td><td><span class="badge badge-amber">AVERAGE</span></td></tr>
+            <tr><td>East Division</td><td style="color:var(--red)">-0.05%</td><td><span class="badge badge-amber">AVERAGE</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="kpi-card alert">
+        <div class="kpi-label" style="color:rgba(255,255,255,0.7)">Total Anomalies Detected</div>
+        <div class="kpi-value" style="color:white;font-size:3rem">5</div>
+        <div class="kpi-sub" style="color:rgba(255,255,255,0.6)">Auto-detected • Click Anomaly page</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Trend Line -->
+  <div class="chart-card" style="margin-top:1rem">
+    <div class="chart-title">Monthly Revenue Trend — 2023 vs 2024 <span>₹ Crores | West Division Oct 2023 spike visible</span></div>
+    <svg viewBox="0 0 800 100" style="width:100%;height:100px">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1a56db" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#1a56db" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0d9488" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#0d9488" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- 2023 line with Oct spike -->
+      <polyline points="33,72 66,75 99,68 132,68 165,66 198,66 231,67 264,65 297,67 330,20 363,71 396,68" fill="none" stroke="#1a56db" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- 2024 line -->
+      <polyline points="432,62 465,65 498,60 531,58 564,57 597,56 630,55 663,40 696,54 729,52 762,50 795,49" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Spike annotation -->
+      <circle cx="330" cy="20" r="5" fill="#dc2626"/>
+      <line x1="330" y1="25" x2="330" y2="15" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="335" y="14" font-size="8" fill="#dc2626" font-family="DM Sans">⚠ Oct 2023 Spike</text>
+      <!-- Legend -->
+      <rect x="600" y="5" width="10" height="3" rx="1" fill="#1a56db"/>
+      <text x="614" y="9" font-size="8" fill="#6b7280" font-family="DM Sans">2023</text>
+      <rect x="640" y="5" width="10" height="3" rx="1" fill="#0d9488"/>
+      <text x="654" y="9" font-size="8" fill="#6b7280" font-family="DM Sans">2024</text>
+      <!-- Month labels -->
+      <text x="33" y="98" font-size="7" fill="#9ca3af" text-anchor="middle" font-family="DM Sans">Jan</text>
+      <text x="99" y="98" font-size="7" fill="#9ca3af" text-anchor="middle" font-family="DM Sans">Mar</text>
+      <text x="198" y="98" font-size="7" fill="#9ca3af" text-anchor="middle" font-family="DM Sans">Jun</text>
+      <text x="330" y="98" font-size="7" fill="#dc2626" text-anchor="middle" font-family="DM Sans">Oct</text>
+      <text x="396" y="98" font-size="7" fill="#9ca3af" text-anchor="middle" font-family="DM Sans">Dec 23</text>
+      <text x="795" y="98" font-size="7" fill="#9ca3af" text-anchor="middle" font-family="DM Sans">Dec 24</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE 2 — P&L STATEMENT -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-1">
+  <div class="page-header">
+    <div><h1>P&L Statement</h1><p>Full income statement — all account lines, all divisions, all periods</p></div>
+    <div class="page-header-right"><div class="date">Slicers: All Divisions | All Periods</div></div>
+  </div>
+
+  <div class="kpi-grid kpi-4" style="margin-bottom:1rem">
+    <div class="kpi-card green"><div class="kpi-label">Gross Profit</div><div class="kpi-value">₹3.74 Cr</div><div class="kpi-sub kpi-up">Gross Margin 46.4%</div></div>
+    <div class="kpi-card teal"><div class="kpi-label">EBITDA</div><div class="kpi-value">₹2.59 Cr</div><div class="kpi-sub kpi-up">EBITDA Margin 32.1%</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total COGS</div><div class="kpi-value">₹4.32 Cr</div><div class="kpi-sub kpi-down">53.6% of Revenue</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total OPEX</div><div class="kpi-value">₹1.15 Cr</div><div class="kpi-sub kpi-neutral">14.3% of Revenue</div></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Full P&L — All Divisions Consolidated <span>₹ Crores | Actual vs Budget</span></div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Account</th><th>Type</th><th>Actual (₹ Cr)</th><th>Budget (₹ Cr)</th><th>Variance (₹ Cr)</th><th>Variance %</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr style="background:#eff6ff"><td><strong>Product Revenue</strong></td><td><span class="badge badge-blue">Revenue</span></td><td>6.62</td><td>6.79</td><td style="color:var(--red)">-0.17</td><td style="color:var(--red)">-2.5%</td><td><span class="badge badge-amber">UNFAVORABLE</span></td></tr>
+        <tr style="background:#eff6ff"><td><strong>Service Revenue</strong></td><td><span class="badge badge-blue">Revenue</span></td><td>1.01</td><td>1.03</td><td style="color:var(--red)">-0.02</td><td style="color:var(--red)">-1.9%</td><td><span class="badge badge-amber">UNFAVORABLE</span></td></tr>
+        <tr style="background:#eff6ff"><td><strong>Other Income</strong></td><td><span class="badge badge-blue">Revenue</span></td><td>0.43</td><td>0.44</td><td style="color:var(--red)">-0.01</td><td style="color:var(--red)">-2.3%</td><td><span class="badge badge-amber">UNFAVORABLE</span></td></tr>
+        <tr style="font-weight:700;background:#dbeafe"><td>Total Revenue</td><td></td><td>8.06</td><td>8.26</td><td style="color:var(--red)">-0.20</td><td style="color:var(--red)">-2.4%</td><td><span class="badge badge-red">UNFAVORABLE</span></td></tr>
+        <tr><td>Cost of Goods Sold</td><td><span class="badge badge-grey">COGS</span></td><td>-4.05</td><td>-3.97</td><td style="color:var(--red)">-0.08</td><td style="color:var(--red)">-2.0%</td><td><span class="badge badge-red">UNFAVORABLE</span></td></tr>
+        <tr><td>Direct Labour Cost</td><td><span class="badge badge-grey">COGS</span></td><td>-0.27</td><td>-0.26</td><td style="color:var(--red)">-0.01</td><td style="color:var(--red)">-3.8%</td><td><span class="badge badge-red">UNFAVORABLE</span></td></tr>
+        <tr style="font-weight:700;background:#f0fdf4"><td>Gross Profit</td><td></td><td>3.74</td><td>4.03</td><td style="color:var(--red)">-0.29</td><td style="color:var(--red)">-7.2%</td><td></td></tr>
+        <tr><td>Sales & Marketing</td><td><span class="badge badge-grey">OPEX</span></td><td>-0.60</td><td>-0.59</td><td style="color:var(--red)">-0.01</td><td style="color:var(--red)">-1.7%</td><td><span class="badge badge-red">UNFAVORABLE</span></td></tr>
+        <tr><td style="color:var(--red)">G&A Expense ⚠</td><td><span class="badge badge-grey">OPEX</span></td><td>-0.47</td><td>-0.37</td><td style="color:var(--red)">-0.10</td><td style="color:var(--red)">-27%</td><td><span class="badge badge-red">BREACH</span></td></tr>
+        <tr><td style="color:var(--amber)">Depreciation ⚠</td><td><span class="badge badge-grey">OPEX</span></td><td>-0.08</td><td>-0.18</td><td style="color:var(--green)">+0.10</td><td style="color:var(--green)">+55.6%</td><td><span class="badge badge-amber">MISSING ACCRUAL</span></td></tr>
+        <tr style="font-weight:700;background:#f0fdf4"><td>EBITDA</td><td></td><td>2.59</td><td>2.89</td><td style="color:var(--red)">-0.30</td><td style="color:var(--red)">-10.4%</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE 3 — VARIANCE ANALYSIS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-2">
+  <div class="page-header">
+    <div><h1>Variance Analysis</h1><p>Why did the numbers move? Budget vs Actual bridge analysis</p></div>
+  </div>
+
+  <div class="kpi-grid kpi-4" style="margin-bottom:1rem">
+    <div class="kpi-card green"><div class="kpi-label">Biggest Favorable Variance</div><div class="kpi-value" style="font-size:1.4rem">West Division</div><div class="kpi-sub kpi-up">+₹0.04 Cr vs budget</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Biggest Unfavorable Variance</div><div class="kpi-value" style="font-size:1.4rem">North Division</div><div class="kpi-sub kpi-down">-₹0.11 Cr vs budget</div></div>
+    <div class="kpi-card"><div class="kpi-label">Budget Achievement Rate</div><div class="kpi-value">97.6%</div><div class="kpi-sub kpi-neutral">Consolidated all divisions</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Variance % All Accounts</div><div class="kpi-value">-2.4%</div><div class="kpi-sub kpi-down">Below plan</div></div>
+  </div>
+
+  <div class="charts-grid charts-2">
+    <!-- Revenue Bridge Waterfall -->
+    <div class="chart-card">
+      <div class="chart-title">Revenue Bridge — Budget to Actual <span>₹ Crores</span></div>
+      <div style="display:flex;align-items:flex-end;gap:8px;height:160px;padding:20px 0 0">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <div style="width:100%;background:var(--blue);height:120px;border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">
+            <span style="font-size:0.65rem;font-weight:700;color:white">₹8.26</span>
+          </div>
+          <div style="font-size:0.6rem;color:var(--grey);margin-top:4px;text-align:center">Budget</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <div style="font-size:0.6rem;color:var(--green);margin-bottom:2px">+0.04</div>
+          <div style="width:100%;background:var(--green);height:8px;border-radius:4px;margin-top:104px"></div>
+          <div style="font-size:0.6rem;color:var(--grey);margin-top:4px;text-align:center">West</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <div style="font-size:0.6rem;color:var(--red);margin-bottom:2px">-0.11</div>
+          <div style="width:100%;background:var(--red);height:16px;border-radius:4px;margin-top:96px"></div>
+          <div style="font-size:0.6rem;color:var(--grey);margin-top:4px;text-align:center">North</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <div style="font-size:0.6rem;color:var(--red);margin-bottom:2px">-0.06</div>
+          <div style="width:100%;background:var(--red);height:10px;border-radius:4px;margin-top:102px"></div>
+          <div style="font-size:0.6rem;color:var(--grey);margin-top:4px;text-align:center">South</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <div style="font-size:0.6rem;color:var(--red);margin-bottom:2px">-0.07</div>
+          <div style="width:100%;background:var(--red);height:10px;border-radius:4px;margin-top:102px"></div>
+          <div style="font-size:0.6rem;color:var(--grey);margin-top:4px;text-align:center">East</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <div style="width:100%;background:var(--teal);height:114px;border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">
+            <span style="font-size:0.65rem;font-weight:700;color:white">₹8.06</span>
+          </div>
+          <div style="font-size:0.6rem;color:var(--grey);margin-top:4px;text-align:center">Actual</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EBITDA Bridge -->
+    <div class="chart-card">
+      <div class="chart-title">EBITDA Bridge by Account Type <span>₹ Crores</span></div>
+      <div class="bar-chart" style="margin-top:0.5rem">
+        <div class="bar-row">
+          <div class="bar-label">Product Rev</div>
+          <div class="bar-track"><div class="bar-fill" style="width:90%;background:var(--green)"><span>+6.62</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Service Rev</div>
+          <div class="bar-track"><div class="bar-fill" style="width:20%;background:var(--green)"><span>+1.01</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">COGS</div>
+          <div class="bar-track"><div class="bar-fill" style="width:70%;background:var(--red)"><span>-4.32</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">OPEX</div>
+          <div class="bar-track"><div class="bar-fill" style="width:20%;background:var(--amber)"><span>-1.15</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label" style="font-weight:700">EBITDA</div>
+          <div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--blue)"><span>= 2.59</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scatter + Top variances -->
+  <div class="charts-grid charts-2" style="margin-top:1rem">
+    <div class="chart-card">
+      <div class="chart-title">Budget Accuracy by Division <span>X=Budget, Y=Actual, Size=EBITDA</span></div>
+      <div class="scatter-wrap">
+        <div class="scatter-axis-x"></div>
+        <div class="scatter-axis-y"></div>
+        <div class="scatter-label-x">Revenue Budget →</div>
+        <!-- North -->
+        <div class="scatter-dot" style="width:48px;height:48px;background:var(--blue);left:72%;top:15%">N</div>
+        <!-- West -->
+        <div class="scatter-dot" style="width:42px;height:42px;background:var(--amber);left:55%;top:28%">W</div>
+        <!-- South -->
+        <div class="scatter-dot" style="width:36px;height:36px;background:var(--teal);left:38%;top:44%">S</div>
+        <!-- East -->
+        <div class="scatter-dot" style="width:32px;height:32px;background:var(--navy);left:18%;top:60%">E</div>
+        <!-- Diagonal reference line -->
+        <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 300 180">
+          <line x1="40" y1="160" x2="280" y2="20" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="5,3"/>
+          <text x="260" y="15" font-size="7" fill="#9ca3af" font-family="DM Sans">Perfect budget</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Top Variances by Account & Division</div>
+      <table class="data-table">
+        <thead><tr><th>Division</th><th>Account</th><th>Variance</th><th>Type</th></tr></thead>
+        <tbody>
+          <tr><td>South</td><td>G&A Expense</td><td style="color:var(--red)">-0.10 Cr</td><td><span class="badge badge-red">UNFAV</span></td></tr>
+          <tr><td>North</td><td>COGS</td><td style="color:var(--red)">-0.08 Cr</td><td><span class="badge badge-red">UNFAV</span></td></tr>
+          <tr><td>East</td><td>Depreciation</td><td style="color:var(--green)">+0.10 Cr</td><td><span class="badge badge-amber">ACCRUAL</span></td></tr>
+          <tr><td>West</td><td>Product Rev</td><td style="color:var(--green)">+0.04 Cr</td><td><span class="badge badge-green">FAV</span></td></tr>
+          <tr><td>All</td><td>Service Rev</td><td style="color:var(--red)">-0.02 Cr</td><td><span class="badge badge-red">UNFAV</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE 4 — BUSINESS UNIT DEEP DIVE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-3">
+  <div class="page-header">
+    <div><h1>Business Unit Deep Dive</h1><p>Division-level detail — RLS applied per head of unit</p></div>
+    <div class="page-header-right"><div class="date">Selected: North Division</div></div>
+  </div>
+
+  <!-- Info cards -->
+  <div class="rls-grid">
+    <div class="rls-card">
+      <div class="rls-avatar" style="background:var(--blue-light)">👤</div>
+      <div class="rls-name">Rajesh Sharma</div>
+      <div class="rls-role">Head of Unit — North</div>
+      <div class="rls-tag" style="background:var(--blue-light);color:var(--blue)">CC-001</div>
+    </div>
+    <div class="rls-card">
+      <div class="rls-avatar" style="background:var(--green-light)">🏭</div>
+      <div class="rls-name">Industrial Equipment</div>
+      <div class="rls-role">North India Region</div>
+      <div class="rls-tag" style="background:var(--green-light);color:var(--green)">Est. 2008</div>
+    </div>
+    <div class="rls-card">
+      <div class="rls-avatar" style="background:var(--amber-light)">👥</div>
+      <div class="rls-name">245 Employees</div>
+      <div class="rls-role">Revenue per Employee</div>
+      <div class="rls-tag" style="background:var(--amber-light);color:var(--amber)">₹0.78 L</div>
+    </div>
+    <div class="rls-card">
+      <div class="rls-avatar" style="background:var(--teal-light)">📊</div>
+      <div class="rls-name">OPEX Ratio</div>
+      <div class="rls-role">Operating leverage</div>
+      <div class="rls-tag" style="background:var(--teal-light);color:var(--teal)">14.3%</div>
+    </div>
+  </div>
+
+  <!-- KPI rows -->
+  <div class="kpi-grid kpi-3" style="margin-bottom:1rem">
+    <div class="kpi-card navy"><div class="kpi-label">Revenue Actual</div><div class="kpi-value">₹2.50 Cr</div></div>
+    <div class="kpi-card"><div class="kpi-label">Revenue Budget</div><div class="kpi-value">₹2.61 Cr</div></div>
+    <div class="kpi-card"><div class="kpi-label">Revenue Prior Year</div><div class="kpi-value">₹2.31 Cr</div><div class="kpi-sub kpi-up">↑ +8.2% YoY</div></div>
+  </div>
+  <div class="kpi-grid kpi-4" style="margin-bottom:1rem">
+    <div class="kpi-card"><div class="kpi-label">YoY Growth %</div><div class="kpi-value" style="color:var(--green)">+8.2%</div></div>
+    <div class="kpi-card"><div class="kpi-label">MoM Growth %</div><div class="kpi-value" style="color:var(--green)">+1.4%</div></div>
+    <div class="kpi-card red"><div class="kpi-label">COGS % of Revenue</div><div class="kpi-value">53.6%</div><div class="kpi-sub kpi-down">⚠ Jun 2024 breach</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Gross Margin %</div><div class="kpi-value">46.4%</div></div>
+  </div>
+
+  <!-- 24M Line Chart -->
+  <div class="chart-card" style="margin-bottom:1rem">
+    <div class="chart-title">24-Month Revenue Trend — North Division <span>Jan 2023 – Dec 2024 | ₹ Crores monthly</span></div>
+    <svg viewBox="0 0 800 80" style="width:100%;height:80px">
+      <polyline points="33,55 66,57 99,52 132,52 165,50 198,50 231,51 264,49 297,51 330,53 363,55 396,52 432,47 465,49 498,44 531,42 564,41 597,40 630,38 663,55 696,37 729,35 762,33 795,32"
+        fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- COGS breach Jun 2024 -->
+      <circle cx="630" cy="38" r="5" fill="none" stroke="var(--red)" stroke-width="2"/>
+      <text x="635" y="32" font-size="7" fill="var(--red)" font-family="DM Sans">⚠ COGS Breach</text>
+    </svg>
+    <div class="month-grid">
+      <div class="month-cell">J23</div><div class="month-cell">F</div><div class="month-cell">M</div><div class="month-cell">A</div><div class="month-cell">M</div><div class="month-cell">J</div><div class="month-cell">J</div><div class="month-cell">A</div><div class="month-cell">S</div><div class="month-cell">O</div><div class="month-cell">N</div><div class="month-cell">D23</div>
+    </div>
+  </div>
+
+  <div class="charts-grid charts-2">
+    <!-- Monthly Actual vs Budget -->
+    <div class="chart-card">
+      <div class="chart-title">Monthly Actual vs Budget <span>North Division 2024</span></div>
+      <div class="bar-chart">
+        <div class="bar-row"><div class="bar-label">Jan 2024</div><div class="bar-track"><div class="bar-fill" style="width:75%;background:var(--blue)"><span>Actual</span></div></div><div class="bar-val">0.19</div></div>
+        <div class="bar-row"><div class="bar-label">Mar 2024</div><div class="bar-track"><div class="bar-fill" style="width:78%;background:var(--blue)"><span>Actual</span></div></div><div class="bar-val">0.20</div></div>
+        <div class="bar-row"><div class="bar-label">Jun 2024</div><div class="bar-track"><div class="bar-fill" style="width:70%;background:var(--red)"><span>Below</span></div></div><div class="bar-val">0.18</div></div>
+        <div class="bar-row"><div class="bar-label">Sep 2024</div><div class="bar-track"><div class="bar-fill" style="width:82%;background:var(--blue)"><span>Actual</span></div></div><div class="bar-val">0.21</div></div>
+        <div class="bar-row"><div class="bar-label">Dec 2024</div><div class="bar-track"><div class="bar-fill" style="width:88%;background:var(--green)"><span>Above</span></div></div><div class="bar-val">0.23</div></div>
+      </div>
+    </div>
+
+    <!-- Mini P&L -->
+    <div class="chart-card">
+      <div class="chart-title">P&L Summary — North Division</div>
+      <table class="data-table">
+        <thead><tr><th>Account</th><th>Actual</th><th>Budget</th><th>Var%</th></tr></thead>
+        <tbody>
+          <tr><td>Product Revenue</td><td>2.06</td><td>2.15</td><td style="color:var(--red)">-4.2%</td></tr>
+          <tr><td>Service Revenue</td><td>0.31</td><td>0.32</td><td style="color:var(--red)">-3.1%</td></tr>
+          <tr><td>COGS</td><td>-1.25</td><td>-1.19</td><td style="color:var(--red)">-5.0%</td></tr>
+          <tr><td>OPEX</td><td>-0.35</td><td>-0.33</td><td style="color:var(--red)">-6.1%</td></tr>
+          <tr style="font-weight:700"><td>EBITDA</td><td>0.77</td><td>0.95</td><td style="color:var(--red)">-18.9%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE 5 — ANOMALY INTELLIGENCE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-4">
+  <div class="page-header">
+    <div><h1>Anomaly Intelligence</h1><p>Automated financial risk detection — 2σ statistical methodology</p></div>
+    <div class="page-header-right"><div class="date">5 anomalies auto-detected</div><div class="status" style="background:rgba(220,38,38,0.2);color:#f87171"><span class="status-dot" style="background:#f87171"></span> Requires Review</div></div>
+  </div>
+
+  <div class="kpi-grid kpi-5" style="margin-bottom:1rem">
+    <div class="kpi-card alert"><div class="kpi-label" style="color:rgba(255,255,255,0.7)">Total Anomalies</div><div class="kpi-value" style="color:white;font-size:2.5rem">5</div></div>
+    <div class="kpi-card red"><div class="kpi-label">IC Mismatches</div><div class="kpi-value">91</div><div class="kpi-sub kpi-down">3 months affected</div></div>
+    <div class="kpi-card amber"><div class="kpi-label">Unreconciled Amount</div><div class="kpi-value">₹0.31 L</div><div class="kpi-sub kpi-down">IC variance total</div></div>
+    <div class="kpi-card"><div class="kpi-label">Missing Accruals</div><div class="kpi-value">1</div><div class="kpi-sub kpi-neutral">East Dec 2023</div></div>
+    <div class="kpi-card"><div class="kpi-label">Budget Breaches</div><div class="kpi-value">1</div><div class="kpi-sub kpi-neutral">South Q3 2024</div></div>
+  </div>
+
+  <!-- Anomaly list -->
+  <div class="chart-card" style="margin-bottom:1rem">
+    <div class="chart-title">All Detected Anomalies <span>Auto-flagged by statistical detection engine</span></div>
+    <div class="anomaly-list">
+      <div class="anomaly-item" style="background:var(--red-light);border-color:#fca5a5">
+        <div class="anomaly-icon" style="background:var(--red)">📈</div>
+        <div class="anomaly-info">
+          <div class="anomaly-title">West Division — Revenue Spike</div>
+          <div class="anomaly-desc">Oct 2023 | Product Revenue 3.4× above normal | Detected by: 2σ statistical rule + Budget Breach Flag</div>
+        </div>
+        <div class="anomaly-badge"><span class="badge badge-red">HIGH RISK</span></div>
+      </div>
+      <div class="anomaly-item" style="background:var(--amber-light);border-color:#fcd34d">
+        <div class="anomaly-icon" style="background:var(--amber)">💸</div>
+        <div class="anomaly-info">
+          <div class="anomaly-title">South Division — G&A Cost Overrun</div>
+          <div class="anomaly-desc">Q3 2024 (Jul–Sep) | G&A Expense 1.67× normal for 3 months | Detected by: Variance Type Flag = UNFAVORABLE</div>
+        </div>
+        <div class="anomaly-badge"><span class="badge badge-amber">MEDIUM RISK</span></div>
+      </div>
+      <div class="anomaly-item" style="background:var(--amber-light);border-color:#fcd34d">
+        <div class="anomaly-icon" style="background:var(--amber)">⚠️</div>
+        <div class="anomaly-info">
+          <div class="anomaly-title">East Division — Missing Depreciation Accrual</div>
+          <div class="anomaly-desc">Dec 2023 | Depreciation posted as ₹0 | Normally posts ₹490/month | Detected by: Missing Accrual Count</div>
+        </div>
+        <div class="anomaly-badge"><span class="badge badge-amber">MEDIUM RISK</span></div>
+      </div>
+      <div class="anomaly-item" style="background:var(--red-light);border-color:#fca5a5">
+        <div class="anomaly-icon" style="background:var(--red)">📦</div>
+        <div class="anomaly-info">
+          <div class="anomaly-title">North Division — COGS Breach</div>
+          <div class="anomaly-desc">Jun 2024 | COGS 1.45× above normal | Gross Margin dropped sharply | Detected by: COGS % of Revenue spike</div>
+        </div>
+        <div class="anomaly-badge"><span class="badge badge-red">HIGH RISK</span></div>
+      </div>
+      <div class="anomaly-item" style="background:var(--red-light);border-color:#fca5a5">
+        <div class="anomaly-icon" style="background:var(--navy)">🔄</div>
+        <div class="anomaly-info">
+          <div class="anomaly-title">Intercompany Mismatch — North → East</div>
+          <div class="anomaly-desc">Apr 2023, Sep 2023, Mar 2024 | 91 transactions | Amount sent ≠ Amount received | Total variance: ₹0.31 L</div>
+        </div>
+        <div class="anomaly-badge"><span class="badge badge-red">HIGH RISK</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IC Table + Bar -->
+  <div class="charts-grid charts-2">
+    <div class="chart-card">
+      <div class="chart-title">Intercompany Reconciliation <span>North → East Division</span></div>
+      <table class="data-table">
+        <thead><tr><th>Period</th><th>Sent</th><th>Received</th><th>Variance</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--red)">2023-04</td><td>2.45</td><td>2.12</td><td style="color:var(--red)">0.33</td><td><span class="badge badge-red">MISMATCH</span></td></tr>
+          <tr><td style="color:var(--red)">2023-09</td><td>2.81</td><td>2.39</td><td style="color:var(--red)">0.42</td><td><span class="badge badge-red">MISMATCH</span></td></tr>
+          <tr><td style="color:var(--red)">2024-03</td><td>2.63</td><td>2.27</td><td style="color:var(--red)">0.36</td><td><span class="badge badge-red">MISMATCH</span></td></tr>
+          <tr><td>2023-01</td><td>2.10</td><td>2.10</td><td style="color:var(--green)">0.00</td><td><span class="badge badge-green">MATCHED</span></td></tr>
+          <tr><td>2024-01</td><td>2.33</td><td>2.33</td><td style="color:var(--green)">0.00</td><td><span class="badge badge-green">MATCHED</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Anomaly Count by Division</div>
+      <div class="bar-chart" style="margin-top:0.5rem">
+        <div class="bar-row"><div class="bar-label">North Div</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--red)"><span>1 anomaly</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">South Div</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--amber)"><span>1 anomaly</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">East Div</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--red)"><span>2 anomalies</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">West Div</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--amber)"><span>1 anomaly</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE 6 — DATA GOVERNANCE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-5">
+  <div class="page-header">
+    <div><h1>Data Governance</h1><p>Methodology, data lineage, quality metrics and architecture</p></div>
+    <div class="page-header-right"><div class="date">Last Refreshed: 06-Mar-2026 22:59</div><div class="status"><span class="status-dot"></span> Quality Score 98.2%</div></div>
+  </div>
+
+  <div class="kpi-grid kpi-4" style="margin-bottom:1rem">
+    <div class="kpi-card navy"><div class="kpi-label">Total Rows in Dataset</div><div class="kpi-value">47,515</div><div class="kpi-sub kpi-neutral">Across 6 tables</div></div>
+    <div class="kpi-card"><div class="kpi-label">Date Range</div><div class="kpi-value" style="font-size:1.1rem">Jan 2023<br>Dec 2024</div></div>
+    <div class="kpi-card"><div class="kpi-label">Business Units</div><div class="kpi-value">4</div><div class="kpi-sub kpi-neutral">N, S, E, W Divisions</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Data Quality Score</div><div class="kpi-value">98.2%</div><div class="kpi-sub kpi-up">5 known anomalies</div></div>
+  </div>
+
+  <!-- Architecture -->
+  <div class="chart-card" style="margin-bottom:1rem">
+    <div class="chart-title">Data Architecture — Pipeline Flow</div>
+    <div style="display:flex;align-items:center;gap:1rem;padding:1rem 0;overflow-x:auto">
+      <div style="background:var(--navy);color:white;border-radius:8px;padding:0.8rem 1.2rem;text-align:center;min-width:120px">
+        <div style="font-size:1.5rem">🐍</div>
+        <div style="font-size:0.75rem;font-weight:600;margin-top:0.3rem">Python</div>
+        <div style="font-size:0.6rem;opacity:0.7">generate_data.py<br>Faker + NumPy</div>
+      </div>
+      <div style="font-size:1.5rem;color:var(--grey)">→</div>
+      <div style="background:var(--blue);color:white;border-radius:8px;padding:0.8rem 1.2rem;text-align:center;min-width:120px">
+        <div style="font-size:1.5rem">📄</div>
+        <div style="font-size:0.75rem;font-weight:600;margin-top:0.3rem">CSV Files</div>
+        <div style="font-size:0.6rem;opacity:0.7">6 tables<br>47,515 rows</div>
+      </div>
+      <div style="font-size:1.5rem;color:var(--grey)">→</div>
+      <div style="background:var(--teal);color:white;border-radius:8px;padding:0.8rem 1.2rem;text-align:center;min-width:120px">
+        <div style="font-size:1.5rem">🗄️</div>
+        <div style="font-size:0.75rem;font-weight:600;margin-top:0.3rem">SQL Server</div>
+        <div style="font-size:0.6rem;opacity:0.7">MeridianCFO DB<br>6 SQL Queries</div>
+      </div>
+      <div style="font-size:1.5rem;color:var(--grey)">→</div>
+      <div style="background:var(--amber);color:white;border-radius:8px;padding:0.8rem 1.2rem;text-align:center;min-width:120px">
+        <div style="font-size:1.5rem">⚡</div>
+        <div style="font-size:0.75rem;font-weight:600;margin-top:0.3rem">Power Query</div>
+        <div style="font-size:0.6rem;opacity:0.7">Transform<br>Star Schema</div>
+      </div>
+      <div style="font-size:1.5rem;color:var(--grey)">→</div>
+      <div style="background:var(--green);color:white;border-radius:8px;padding:0.8rem 1.2rem;text-align:center;min-width:120px">
+        <div style="font-size:1.5rem">📊</div>
+        <div style="font-size:0.75rem;font-weight:600;margin-top:0.3rem">Power BI</div>
+        <div style="font-size:0.6rem;opacity:0.7">40+ DAX Measures<br>6 Dashboard Pages</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-grid charts-2">
+    <!-- Table inventory -->
+    <div class="chart-card">
+      <div class="chart-title">Dataset Inventory</div>
+      <table class="data-table">
+        <thead><tr><th>Table</th><th>Rows</th><th>Type</th><th>Refresh</th></tr></thead>
+        <tbody>
+          <tr><td>fact_financials</td><td class="mono">46,784</td><td><span class="badge badge-blue">Fact</span></td><td>Daily</td></tr>
+          <tr><td>fact_intercompany</td><td class="mono">731</td><td><span class="badge badge-blue">Fact</span></td><td>Daily</td></tr>
+          <tr><td>dim_date</td><td class="mono">731</td><td><span class="badge badge-grey">Dim</span></td><td>Static</td></tr>
+          <tr><td>dim_business_unit</td><td class="mono">4</td><td><span class="badge badge-grey">Dim</span></td><td>Static</td></tr>
+          <tr><td>dim_account</td><td class="mono">8</td><td><span class="badge badge-grey">Dim</span></td><td>Static</td></tr>
+          <tr><td>dim_scenario</td><td class="mono">3</td><td><span class="badge badge-grey">Dim</span></td><td>Static</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Anomaly methodology -->
+    <div class="chart-card">
+      <div class="chart-title">Anomaly Detection Methodology</div>
+      <table class="data-table">
+        <thead><tr><th>Method</th><th>Threshold</th><th>Catches</th></tr></thead>
+        <tbody>
+          <tr><td>2σ Statistical Rule</td><td>>2 std dev</td><td>Revenue spikes</td></tr>
+          <tr><td>Budget Breach Flag</td><td>>10% variance</td><td>Plan breaches</td></tr>
+          <tr><td>Missing Accrual</td><td>Amount = 0</td><td>Close errors</td></tr>
+          <tr><td>IC Reconciliation</td><td>Sent ≠ Received</td><td>IC mismatches</td></tr>
+          <tr><td>COGS % Threshold</td><td>>55% of Rev</td><td>Margin erosion</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(n) {
+  document.querySelectorAll('.page').forEach((p,i) => {
+    p.classList.toggle('active', i === n);
+  });
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === n);
+  });
+}
+</script>
+</body>
+</html>
